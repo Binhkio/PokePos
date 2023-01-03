@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title>Document</title>
+    <style>
+        input {
+            margin-bottom: 10px;
+            padding: 4px;
+        }
+        button:hover {
+            background-color: azure;
+        }
+        body {
+            margin: 0 20px;
+        }
+    </style>
+</head>
+<body>
+    <div style="display: grid; width: 50%; margin: 20px auto;">
+        <label><b>Pokemon's name</b></label><input id="poke-name" placeholder="(Exp: Pikachu...)"/>
+        <label><b>Your position </b>(Looking for Pokemon within 10km radius)</label><input id="poke-pos" placeholder="(Exp: '40.983437,-73.125808')"/>
+        <div>
+            <button id="check-btn" onclick="check()" >Find pokemon</button>
+            <button id="auto-check-btn" onclick="autoCheck()" >Auto check</button>
+            <button id="stop-check-btn" onclick="stopCheck()" >Stop auto</button>
+        </div>
+    </div>
+    <input
+        id="table-search-input"
+        type="text"
+        placeholder="Search..."
+        aria-label="Search..."
+        aria-describedby="basic-addon2"
+    />
+    <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Group</th>
+            <th scope="col">Name</th>
+            <th scope="col">Iv</th>
+            <th scope="col">CP</th>
+            <th scope="col">DSP</th>
+            <th scope="col">Lv</th>
+            <th scope="col">Time start</th>
+            <th scope="col">Image</th>
+            <th scope="col">Location</th>
+            <th scope="col">Distance</th>
+            <th scope="col">Country</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          
+        </tbody>
+      </table>
+</body>
+<script>
+    $(document).ready(function () {
+        document.getElementById("poke-name").value = window.localStorage.getItem("poke-name")
+        document.getElementById("poke-pos").value = window.localStorage.getItem("poke-pos")
+
+        $("#table-search-input").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#table-body tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+    })
+
+    function copy(content, id) {
+        document.getElementById(`copy-${id}`).innerText = "Copied"
+        if(!!content){
+            navigator.clipboard.writeText(content)
+        }
+    }
+
+    const checkBtn = document.getElementById("check-btn")
+    const autoCheckBtn = document.getElementById("auto-check-btn")
+    const stopCheckBtn = document.getElementById("stop-check-btn")
+
+    let interval = null
+    async function autoCheck(){
+        autoCheckBtn.setAttribute("disabled", "disabled");
+        checkBtn.setAttribute("disabled", "disabled");
+        autoCheckBtn.innerHTML = 'Auto checking...';
+        await defaultCheck()
+        interval = setInterval(async ()=>{
+            await defaultCheck()
+        }, 30*1000)
+    }
+    async function stopCheck(){
+        checkBtn.disabled = false;
+        autoCheckBtn.disabled = false;
+        autoCheckBtn.innerHTML = 'Auto check';
+        checkBtn.innerHTML = 'Find pokemon';
+        clearInterval(interval)
+    }
+    async function check(){
+        checkBtn.setAttribute("disabled", "disabled");
+        checkBtn.innerHTML = 'Loading...';
+        await defaultCheck()
+        checkBtn.disabled = false;
+        checkBtn.innerHTML = 'Find pokemon';
+    }
+
+    async function defaultCheck(){
+        console.log("Check");
+
+        const pokeName = document.getElementById("poke-name").value
+        const position = document.getElementById("poke-pos").value
+        
+        window.localStorage.setItem("poke-name", pokeName)
+        window.localStorage.setItem("poke-pos", position)
+
+        const groupData = [
+            {
+                id: "259536527221063683",
+                name: "100community",
+                poke: {
+                    pos: position ?? '',
+                    name: pokeName ?? ''
+                }
+            },
+            // {
+            //     id: "259296509361782784",
+            //     name: "2600cp",
+            //     poke: {
+            //         pos: position ?? '',
+            //         name: pokeName ?? ''
+            //     }
+            // },
+            {
+                id: "283442715188920321",
+                name: "level30community",
+                poke: {
+                    pos: position ?? '',
+                    name: pokeName ?? ''
+                }
+            }
+        ]
+        
+        const table = document.getElementById("table-body")
+        
+        const response = await axios.post("http://localhost:8080/data", groupData)
+        table.innerHTML = ""
+        pokeList = response.data.results.flat(1)
+        pokeList.sort((a, b) => {
+            return a.distance - b.distance
+        })
+        const prevPokemon = {
+            name: '',
+            location: ''
+        }
+        pokeList = pokeList.filter((val) => {
+            if(val.name === prevPokemon.name && val.location === prevPokemon.location){
+                return false
+            }
+            prevPokemon.name = val.name
+            prevPokemon.location = val.location
+            return true
+        })
+        pokeList.forEach((val, idx) => {
+            table.innerHTML += 
+            `
+            <tr>
+                <td class="poke-row-id" scope="col">${idx}</td>
+                <td class="poke-row-group" scope="col">${val.group}</td>
+                <td class="poke-row-name" scope="col">${val.name}</td>
+                <td class="poke-row-iv" scope="col">${val.iv}</td>
+                <td class="poke-row-cp" scope="col">${val.cp}</td>
+                <td class="poke-row-dsp" scope="col">${val.dsp}</td>
+                <td class="poke-row-lv" scope="col">${val.lv}</td>
+                <td class="poke-row-time" scope="col">${val.timeStart}</td>
+                <td scope="col"><img src="${val.image}"></td>
+                <td scope="col">${val.location}   <button id="copy-${idx}" onclick="copy('${val.location}', '${idx}')">Copy</button></td>
+                <td class="poke-row-distance" scope="col">${val.distance}km</td>
+                <td scope="col"><img src="${val.country}"></td>
+            </tr>
+            `
+        })
+
+    }
+</script>
+</html>
