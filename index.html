@@ -31,6 +31,7 @@
             <button id="auto-check-btn" onclick="autoCheck()" >Auto check</button>
             <button id="stop-check-btn" onclick="stopCheck()" >Stop auto</button>
         </div>
+        <div id="error"></div>
     </div>
     <input
         id="table-search-input"
@@ -113,6 +114,9 @@
     async function defaultCheck(){
         console.log("Check");
 
+        const errorField = document.getElementById("error")
+        errorField.innerText = ""
+        
         const pokeName = document.getElementById("poke-name").value
         const position = document.getElementById("poke-pos").value
         
@@ -149,6 +153,9 @@
         const table = document.getElementById("table-body")
         
         const response = await axios.post("http://localhost:8080/data", groupData)
+        if(response.data.success === false){
+            errorField.innerText = response.data.message
+        }
         table.innerHTML = ""
         pokeList = response.data.results.flat(1)
         pokeList.sort((a, b) => {

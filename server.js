@@ -12,8 +12,8 @@ app.use(cors())
 // app.options('*', cors())
 
 
-var authorization = 'Njk1ODAxMTgxMzkzNTE4Njky.GXnkjX.jhYSCtG7lmqbhYkgcf-L3xeT3QlPcQxV2Webic'
-var cookie = '__dcfduid=5eaa8a20e15411ecb909877d783ce8c3; __sdcfduid=5eaa8a21e15411ecb909877d783ce8c3f2036ce5f4c64b1873916b8a6c4caf84213512fa430b5db78030339813d1040e; _ga=GA1.2.616097936.1654051304; __cfruid=7961fa7174fc53c30531ff7be71e636cb38c12ef-1672735537; _gcl_au=1.1.1814232549.1672735547; OptanonConsent=isIABGlobal=false&datestamp=Tue+Jan+03+2023+15%3A45%3A47+GMT%2B0700+(Indochina+Time)&version=6.33.0&hosts=&landingPath=https%3A%2F%2Fdiscord.com%2F&groups=C0001%3A1%2CC0002%3A1%2CC0003%3A1; _gid=GA1.2.849536456.1672735548; locale=vi'
+var authorization = 'Njk1ODAxMTgxMzkzNTE4Njky.GmUkn4.ADojIaVMNhJ5ZKi7JQ6REHru9G1lxi5n77up-s'
+var cookie = '__dcfduid=5eaa8a20e15411ecb909877d783ce8c3; __sdcfduid=5eaa8a21e15411ecb909877d783ce8c3f2036ce5f4c64b1873916b8a6c4caf84213512fa430b5db78030339813d1040e; _ga=GA1.2.616097936.1654051304; _gcl_au=1.1.1814232549.1672735547; OptanonConsent=isIABGlobal=false&datestamp=Tue+Jan+03+2023+15%3A45%3A47+GMT%2B0700+(Indochina+Time)&version=6.33.0&hosts=&landingPath=https%3A%2F%2Fdiscord.com%2F&groups=C0001%3A1%2CC0002%3A1%2CC0003%3A1; locale=vi; __cfruid=704c1e4e0b2e8d1db5c04f46ae87e8815423e6c1-1672839359; __cf_bm=KW2xJwI.gAgKkt2JTVCcoWe6bJigV5wmXVvN9SJLqe4-1672839606-0-Add0+90SDl6rfJPcZpR4eDvfX8RWIW7Zpk+VSUCYf/yYVS7XSaA+6kIxPI6LgxftqtGM8ur4Z6YxMbNxoywy1oM4uLEDci2Vyoakgptgbl+2Wlja7MHO30btdvRl9226mTeqwW2sgfs4aooyRh6sRhU='
 var cookie_session = 'sessionid=j13ui737ne39xsrzg2okloej3fykhjrx; csrftoken=JCUz0rOC0iVqfGQRsaAmVFJWe5eKi1aUtzNFTe90YArku3xi38SesplvILLRqChD'
 // Number of messages
 var numsOfMessages = 20
@@ -165,7 +165,8 @@ const getMessage = async (groupId, groupName, Position, PokeName) => {
         // console.log(data);
         return data
     } catch (error) {
-        console.log(error);
+        console.log(error, "Get discord page");
+        return false
     }
 }
 
@@ -175,12 +176,18 @@ app.get('/', (req, res) => {
 
 app.post('/data', async (req, res) => {
     try {
+        console.log("Getting data...");
         const groupData = req.body
         let promiseGroupData = groupData.map((group, index) => {
             return getMessage(group.id, group.name, group.poke.pos, group.poke.name)
         })
         Promise.all(promiseGroupData).then((results) => {
-            // results.map((val) => val[0])
+            results.forEach((val) => {
+                if(val === false){
+                    return res.json({ success: false, message: "Something error!" })
+                }
+            })
+            console.log("Done...");
             return res.json({ success: true, results })
         })
     } catch (error) {
