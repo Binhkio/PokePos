@@ -152,7 +152,7 @@
         
         const table = document.getElementById("table-body")
         
-        const response = await axios.post("http://localhost:8080/data", groupData)
+        const response = await axios.post("/data", groupData)
         if(response.data.success === false){
             errorField.innerText = response.data.message
         }
