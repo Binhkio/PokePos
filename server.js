@@ -11,13 +11,33 @@ app.use(express.static(path.join(__dirname, '/')));
 app.use(cors())
 // app.options('*', cors())
 
+var oauth2 = "https://discord.com/oauth2/authorize?response_type=code&client_id=319084385980645376&redirect_uri=https%3A%2F%2Fapi.pokedex100.com%2Fdiscord%2Fauth&scope=identify+guilds&state=7lzOF3c9IRwoSzs2umXJcUXnOKa4zl"
 
-var authorization = 'Njk1ODAxMTgxMzkzNTE4Njky.GmUkn4.ADojIaVMNhJ5ZKi7JQ6REHru9G1lxi5n77up-s'
-var cookie = '__dcfduid=5eaa8a20e15411ecb909877d783ce8c3; __sdcfduid=5eaa8a21e15411ecb909877d783ce8c3f2036ce5f4c64b1873916b8a6c4caf84213512fa430b5db78030339813d1040e; _ga=GA1.2.616097936.1654051304; _gcl_au=1.1.1814232549.1672735547; OptanonConsent=isIABGlobal=false&datestamp=Tue+Jan+03+2023+15%3A45%3A47+GMT%2B0700+(Indochina+Time)&version=6.33.0&hosts=&landingPath=https%3A%2F%2Fdiscord.com%2F&groups=C0001%3A1%2CC0002%3A1%2CC0003%3A1; locale=vi; __cfruid=704c1e4e0b2e8d1db5c04f46ae87e8815423e6c1-1672839359; __cf_bm=KW2xJwI.gAgKkt2JTVCcoWe6bJigV5wmXVvN9SJLqe4-1672839606-0-Add0+90SDl6rfJPcZpR4eDvfX8RWIW7Zpk+VSUCYf/yYVS7XSaA+6kIxPI6LgxftqtGM8ur4Z6YxMbNxoywy1oM4uLEDci2Vyoakgptgbl+2Wlja7MHO30btdvRl9226mTeqwW2sgfs4aooyRh6sRhU='
+var authorization = 'Njk1ODAxMTgxMzkzNTE4Njky.GbnhlS.Sd2nl3OI2yxvdEnH0OO4LUFqQQzB5jVEUyqJJo'
+var cookie = '__dcfduid=5eaa8a20e15411ecb909877d783ce8c3; __sdcfduid=5eaa8a21e15411ecb909877d783ce8c3f2036ce5f4c64b1873916b8a6c4caf84213512fa430b5db78030339813d1040e; _ga=GA1.2.616097936.1654051304; _gcl_au=1.1.1814232549.1672735547; __cfruid=60ca6b831853b896288e2a7a0b8d65bda6a24694-1672897238; OptanonConsent=isIABGlobal=false&datestamp=Thu+Jan+05+2023+12%3A40%3A47+GMT%2B0700+(Indochina+Time)&version=6.33.0&hosts=&landingPath=https%3A%2F%2Fdiscord.com%2F&groups=C0001%3A1%2CC0002%3A1%2CC0003%3A1; _gid=GA1.2.533547993.1672897248; __cf_bm=JNxVyPUh4pISJTQoKj1g5Fn_H3wiQNsqDZKYos8AWNg-1672897247-0-AZ0ywARJZNa56EcdBT3F6qz+53qN5t6rphUrU6cye6nsy8p7j5e+yDEQELkdbmumYizLFwnK8UzAv2haKwaalKL2BOeJANYO3G7UGoiCGnKyug8LbCf9nFKvs5MhKhzeVS2neG/mHrKzJ0e92LOHPC8=; locale=vi'
 var cookie_session = 'sessionid=j13ui737ne39xsrzg2okloej3fykhjrx; csrftoken=JCUz0rOC0iVqfGQRsaAmVFJWe5eKi1aUtzNFTe90YArku3xi38SesplvILLRqChD'
 // Number of messages
 var numsOfMessages = 20
 
+var discordAccount = {
+    "login":"pokebot2023@gmail.com",
+    "password":"pokebot123456",
+    "undelete":false,
+    "captcha_key":null,
+    "login_source":null,
+    "gift_code_sku_id":null
+}
+
+// -------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------
+
+async function loginDiscord(){
+    try{
+        const response = await axios.post("https://discord.com/api/v9/auth/login", )
+    }catch(err){
+        console.log(err, "Login discord error");
+    }
+}
 
 function distance(lat1, lon1, lat2, lon2, unit) {
     lat1 = parseFloat(lat1)
